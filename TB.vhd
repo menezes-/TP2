@@ -70,24 +70,45 @@ BEGIN
         WAIT;
 
     END PROCESS;
+ 
 
+ 
+    tests : PROCESS
+    BEGIN
+	     reset <= '1';
+        WAIT FOR clk_period/2;
+        reset <= '0';
+		  -- insere moedas ate 1,75
+		  -- pede uma agua com 25 cents
+		  WAIT FOR Clk_period;
+        agua <= '1';
+        M025 <= '1';
+        WAIT FOR Clk_period;
+        M025 <= '0';
+        agua <= '0';
 
-	 
-	 test2: PROCESS
-	 BEGIN
-	  -- insere uma moeda de 1 real e retira uma agua
-     reset <= '1';
-	  wait for clk_period/2;
-	  reset <= '0';
-	  wait for clk_period;
-	  M100 <= '1'; -- insere moeda de um real
-	  wait for clk_period;
-	  M100 <= '0';
-	  agua <= '1'; -- pede uma agua
-	  wait for clk_period;
-	  agua <= '0';
-	  wait;
-	 end process;
-	 
+        M050 <= '1';
+        WAIT FOR Clk_period;
+        M050 <= '0';
+
+        M100 <= '1';
+        WAIT FOR Clk_period;
+        M100 <= '0';
+
+        -- insere uma moeda de 1 real e retira uma agua
+		  wait for 40 ns;
+        reset <= '1';
+        WAIT FOR clk_period/2;
+        reset <= '0';
+        WAIT FOR clk_period;
+        M100 <= '1'; -- insere moeda de um real
+        WAIT FOR clk_period;
+        M100 <= '0';
+        agua <= '1'; -- pede uma agua
+        WAIT FOR clk_period;
+        agua <= '0';
+        WAIT;
+    END PROCESS;
+ 
 
 END TbMaq;

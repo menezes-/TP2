@@ -55,16 +55,16 @@ ENTITY Maquina IS
                 t025 := ir025; -- guarda o total de moedas desde o reset
                 t050 := ir050;
                 t100 := ir100;
-					 mr025 <= t025;
+                mr025 <= t025;
                 mr050 <= t050;
                 mr100 <= t100;
 
             ELSIF clk'EVENT AND clk = '1' THEN
                 CASE estado IS
                     WHEN R000 => 
-                        L_AGUA <= '0';
-                        L_SUCO <= '0';
-								status := "000";
+                        L_AGUA <= '0'; -- para de liberar agua
+                        L_SUCO <= '0'; -- para de liberar suco 
+                        status := "000";
                         REPORT "estado r000";
                         IF agua = '1' OR suco = '1' THEN
                             status := "011";
@@ -198,15 +198,15 @@ ENTITY Maquina IS
                 IF status = "001" THEN
 
                     t025 := t025 + vmr025;
-						  t050 := t050 + vmr050;
-						  t100 := t100 + vmr100;
+                    t050 := t050 + vmr050;
+                    t100 := t100 + vmr100;
                     mr025 <= t025;
                     mr050 <= t050;
                     mr100 <= t100;
                     vmr025 := (OTHERS => '0'); -- guarda as quantidades de moeda nessa "seção"
                     vmr050 := (OTHERS => '0');
                     vmr100 := (OTHERS => '0');
-                    
+ 
                     estado <= R000;
                 END IF;
                 stts <= status;
