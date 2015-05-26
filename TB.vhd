@@ -76,7 +76,9 @@ BEGIN
 	 test2: PROCESS
 	 BEGIN
 	  -- insere uma moeda de 1 real e retira uma agua
-
+     reset <= '1';
+	  wait for clk_period/2;
+	  reset <= '0';
 	  wait for clk_period;
 	  M100 <= '1'; -- insere moeda de um real
 	  wait for clk_period;
