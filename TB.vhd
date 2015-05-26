@@ -29,6 +29,8 @@ signal st050: unsigned(7 downto 0);
 signal st100: unsigned(7 downto 0);
 
 constant Clk_period : time := 10 ns;
+
+signal run: std_logic := '1';
 begin
 	 Maq:entity work.Maquina port map(agua=>agua,
 										suco=>suco,
@@ -56,17 +58,24 @@ begin
 	 
 	Clk_process :process
    begin
-        Clk <= '0';
-        wait for Clk_period/2;
-        Clk <= '1';
-        wait for Clk_period/2;
+	   
+		-- roda somente 3 vezes
+		 for I in 0 to 3 loop
+          Clk <= '0';
+          wait for Clk_period/2;
+          Clk <= '1';
+          wait for Clk_period/2;
+		 end loop;
+		 Clk <= '0';
+		 wait; 
+		
    end process;
 	
 	stim_proc: process
    begin
     wait for Clk_period;
-    M100 <= '1'; wait for Clk_period;
-    agua <= '1'; wait for Clk_period;
+    M025 <= '1';  wait for Clk_period; M025 <= '0';
+
     wait;
 
    end process;
