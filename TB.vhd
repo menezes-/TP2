@@ -71,31 +71,21 @@ BEGIN
 
     END PROCESS;
 
-    test1 : PROCESS
-	 
-    BEGIN
-        -- insere ate 1,75 na maquina
-        -- tenta retirar uma agua com apenas 25 centavos
- 
-        
-        WAIT FOR Clk_period;
-        agua <= '1';
-        M025 <= '1';
-        WAIT FOR Clk_period;
-        M025 <= '0';
-        agua <= '0';
- 
-        M050 <= '1';
-        WAIT FOR Clk_period;
-        M050 <= '0';
- 
-        M100 <= '1';
-        WAIT FOR Clk_period;
-        M100 <= '0';
 
-        wait;
-		  
-    END PROCESS;
+	 
+	 test2: PROCESS
+	 BEGIN
+	  -- insere uma moeda de 1 real e retira uma agua
+
+	  wait for clk_period;
+	  M100 <= '1'; -- insere moeda de um real
+	  wait for clk_period;
+	  M100 <= '0';
+	  agua <= '1'; -- pede uma agua
+	  wait for clk_period;
+	  agua <= '0';
+	  wait;
+	 end process;
 	 
 
 END TbMaq;
