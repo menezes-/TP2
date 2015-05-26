@@ -40,9 +40,9 @@ ENTITY Maquina IS
         VARIABLE vmr025 : unsigned(7 DOWNTO 0) := (OTHERS => '0'); -- guarda as quantidades de moeda nessa "seção"
         VARIABLE vmr050 : unsigned(7 DOWNTO 0) := (OTHERS => '0');
         VARIABLE vmr100 : unsigned(7 DOWNTO 0) := (OTHERS => '0');
-        VARIABLE t025 : unsigned(7 DOWNTO 0) := ir025;
-        VARIABLE t050 : unsigned(7 DOWNTO 0) := ir050;
-        VARIABLE t100 : unsigned(7 DOWNTO 0) := ir100;
+        VARIABLE t025 : unsigned(7 DOWNTO 0) := (OTHERS => '0');
+        VARIABLE t050 : unsigned(7 DOWNTO 0) := (OTHERS => '0');
+        VARIABLE t100 : unsigned(7 DOWNTO 0) := (OTHERS => '0');
         VARIABLE status : std_logic_vector(2 DOWNTO 0);
         BEGIN
             IF reset = '1' THEN
@@ -52,16 +52,19 @@ ENTITY Maquina IS
                 vmr025 := (OTHERS => '0'); -- guarda as quantidades de moeda nessa "seção"
                 vmr050 := (OTHERS => '0');
                 vmr100 := (OTHERS => '0');
-                t025 := (OTHERS => '0'); -- guarda o total de moedas desde o reset
-                t050 := (OTHERS => '0');
-                t100 := (OTHERS => '0');
+                t025 := ir025; -- guarda o total de moedas desde o reset
+                t050 := ir050;
+                t100 := ir100;
+					 mr025 <= t025;
+                mr050 <= t050;
+                mr100 <= t100;
 
             ELSIF clk'EVENT AND clk = '1' THEN
                 CASE estado IS
                     WHEN R000 => 
                         L_AGUA <= '0';
                         L_SUCO <= '0';
-								estado <= "000";
+								status := "000";
                         REPORT "estado r000";
                         IF agua = '1' OR suco = '1' THEN
                             status := "011";
@@ -194,7 +197,9 @@ ENTITY Maquina IS
                 -- atualiza total de variaveis
                 IF status = "001" THEN
 
-                    t100 := t100 + vmr100;
+                    t025 := t025 + vmr025;
+						  t050 := t050 + vmr050;
+						  t100 := t100 + vmr100;
                     mr025 <= t025;
                     mr050 <= t050;
                     mr100 <= t100;
