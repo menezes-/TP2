@@ -31,6 +31,9 @@ ARCHITECTURE TbMaq OF TbMaq IS
     SIGNAL st025 : unsigned(7 DOWNTO 0);
     SIGNAL st050 : unsigned(7 DOWNTO 0);
     SIGNAL st100 : unsigned(7 DOWNTO 0);
+	 SIGNAL u025 : std_logic;
+	 SIGNAL u050 : std_logic;
+	 SIGNAL u100 : std_logic;
 	 
 
     CONSTANT Clk_period : TIME := 10 ns;
@@ -62,7 +65,10 @@ BEGIN
 				iAgua => iAgua,
 				mAgua => mAgua,
 				iSuco => iSuco,
-				mSuco => mSuco
+				mSuco => mSuco,
+				u025 => u025,
+				u050 => u050,
+				u100 => u100
         );
 
     Clk_process : PROCESS

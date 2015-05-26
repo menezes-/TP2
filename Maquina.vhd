@@ -31,7 +31,10 @@ ENTITY Maquina IS
         --abaixo portas de teste remover
         st025 : OUT unsigned(7 DOWNTO 0);
         st050 : OUT unsigned(7 DOWNTO 0);
-        st100 : OUT unsigned(7 DOWNTO 0)
+        st100 : OUT unsigned(7 DOWNTO 0);
+		  u025 : OUT std_logic := '0';
+		  u050 : OUT std_logic := '0';
+		  u100 : OUT std_logic := '0'
         );
 
     END Maquina;
@@ -78,6 +81,9 @@ ENTITY Maquina IS
                     WHEN R000 => 
                         L_AGUA <= '0'; -- para de liberar agua
                         L_SUCO <= '0'; -- para de liberar suco
+								u025 <= '0';
+								u050 <= '0';
+								u100 <= '0';
                         status := "000";
                         REPORT "estado r000";
                         IF agua = '1' OR suco = '1' THEN
@@ -96,6 +102,9 @@ ENTITY Maquina IS
                         END IF;
                     WHEN R025 => 
                         REPORT "estado r025";
+								u050 <= '0';
+								u100 <= '0';
+								u025 <= '1'; --seta visor de 25
                         IF agua = '1' OR suco = '1' THEN
                             status := "011";
                         END IF;
@@ -112,6 +121,9 @@ ENTITY Maquina IS
                         END IF;
 
                     WHEN R050 => 
+								u025 <= '0';
+								u050 <= '1'; --seta visor de 50
+								u100 <= '0';
                         REPORT "estado r050";
                         IF agua = '1' OR suco = '1' THEN
                             status := "011";
@@ -130,6 +142,9 @@ ENTITY Maquina IS
 
                     WHEN R075 => 
                         REPORT "estado r075";
+								u025 <= '1';
+								u050 <= '1';
+								u100 <= '0';
                         IF agua = '1' OR suco = '1' THEN
                             status := "011";
                         END IF;
@@ -146,6 +161,9 @@ ENTITY Maquina IS
                         END IF;
                     WHEN R100 => 
                         REPORT "estado r100";
+								u025 <= '0';
+								u050 <= '0';
+								u100 <= '1';
                         IF agua = '1' THEN
                             -- entrega agua e termina a operacao
                             L_AGUA <= '1';
@@ -168,6 +186,9 @@ ENTITY Maquina IS
                             END IF;
                         END IF;
                     WHEN R125 => 
+								u025 <= '1';
+								u050 <= '0';
+								u100 <= '1';
                         REPORT "estado r125";
                         IF M025 = '1' THEN
                             estado <= R150;
@@ -182,6 +203,9 @@ ENTITY Maquina IS
 
                     WHEN R150 => 
                         REPORT "estado r150";
+								u025 <= '0';
+								u050 <= '1';
+								u100 <= '1';
                         IF M025 = '1' THEN
                             estado <= R175;
                             vmr025 := vmr025 + 1;
@@ -194,6 +218,9 @@ ENTITY Maquina IS
                         END IF;
                     WHEN R175 => 
                         REPORT "estado r175";
+								u025 <= '1';
+								u050 <= '1';
+								u100 <= '1';
                         IF M025 = '1' THEN
                             estado <= R175;
                             -- devolve 25 de troco
@@ -209,6 +236,7 @@ ENTITY Maquina IS
                 st025 <= vmr025;
                 st050 <= vmr050;
                 st100 <= vmr100;
+					 
                 -- atualiza total de variaveis
                 IF status = "001" THEN
                     -- atualiza moedas
