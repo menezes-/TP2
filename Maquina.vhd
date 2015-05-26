@@ -61,7 +61,7 @@ ENTITY Maquina IS
                     WHEN R000 => 
                         L_AGUA <= '0';
                         L_SUCO <= '0';
-
+								estado <= "000";
                         REPORT "estado r000";
                         IF agua = '1' OR suco = '1' THEN
                             status := "011";
