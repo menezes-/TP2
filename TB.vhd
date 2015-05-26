@@ -138,6 +138,13 @@ BEGIN
 		  agua <= '0';
 		  M100 <= '0';
 		  
+		  --- Pede uma agua, quando nao tem agua
+		  agua <= '1';
+		  WAIT FOR clk_period;
+		  agua <= '1';
+		  agua <= '0';
+		  
+		  
 		  WAIT FOR 40 ns;
 		  
 		  -- reseta
@@ -222,8 +229,67 @@ BEGIN
 		  WAIT FOR clk_period;
 		  suco <= '0';
 		  
+		  reset <= '1';
+        WAIT FOR clk_period/2;
+        reset <= '0';
+		  
+		  -- devolucao acima de 1,75
+		  M100 <='1';
+		  WAIT FOR clk_period;
+		  M100 <= '0';
+		  
+		  M100 <='1';
+		  WAIT FOR clk_period;
+		  M100 <= '0';
+		  
+		  suco <='1';
+		  WAIT FOR clk_period;
+		  suco <='0';
+		  
+		  -- sem troco
+		  WAIT FOR clk_period;
+		  M100 <='1';
+		  WAIT FOR clk_period;
+		  M100 <= '0';
+		  
+		  M100 <='1';
+		  WAIT FOR clk_period;
+		  M100 <= '0';
+		  
+		  suco <='1';
+		  WAIT FOR clk_period;
+		  suco <='0';
+		  
+		  --pede agua, nao tem troco 
+		  ir025 <= "00000000";
+		  
+		  reset <= '1';
+        WAIT FOR clk_period/2;
+        reset <= '0';
+		  
+		  M100 <='1';
+		  WAIT FOR clk_period;
+		  M100 <= '0';
 		  
 		  
+		  M025 <='1';
+		  WAIT FOR clk_period;
+		  M025 <= '0';
+		  agua <= '1';
+		  WAIT FOR clk_period;
+		  agua <='0';
+		  
+		  
+
+		  
+		  
+		  
+		  
+		  
+		  
+		  
+		  
+
 		  
         run <= '0'; -- termina a simulacao
         WAIT;
