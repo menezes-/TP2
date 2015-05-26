@@ -130,6 +130,8 @@ BEGIN
             WAIT FOR clk_period;
             agua <= '0';
         END LOOP;
+		  agua <= '0';
+		  M100 <= '0';
 		  
 		  WAIT FOR 40 ns;
 		  
@@ -138,6 +140,10 @@ BEGIN
         WAIT FOR clk_period/2;
         reset <= '0';
 		  
+		  -- insere 1 moeda de um real e insere mais uma moeda de um real
+		  M100 <= '1';
+		  WAIT FOR clk_period*2; -- espera dois periodos de clock 
+		  M100 <= '0';
 		  
         run <= '0'; -- termina a simulacao
         WAIT;
