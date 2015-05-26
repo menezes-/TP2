@@ -29,8 +29,6 @@ ARCHITECTURE TbMaq OF TbMaq IS
     SIGNAL st100 : unsigned(7 DOWNTO 0);
 
     CONSTANT Clk_period : TIME := 10 ns;
-
-    SIGNAL run : std_logic := '1';
 BEGIN
     Maq : ENTITY work.Maquina
         PORT MAP(
@@ -59,9 +57,10 @@ BEGIN
         );
 
     Clk_process : PROCESS
+
     BEGIN
-        -- roda somente 10 vezes
-        FOR I IN 0 TO 9 LOOP
+        -- roda somente 100 vezes
+        FOR I IN 0 TO 100 LOOP
             Clk <= '0';
             WAIT FOR Clk_period/2;
             Clk <= '1';
@@ -72,21 +71,31 @@ BEGIN
 
     END PROCESS;
 
-    stim_proc : PROCESS
+    test1 : PROCESS
+	 
     BEGIN
+        -- insere ate 1,75 na maquina
+        -- tenta retirar uma agua com apenas 25 centavos
+ 
+        
         WAIT FOR Clk_period;
+        agua <= '1';
         M025 <= '1';
         WAIT FOR Clk_period;
         M025 <= '0';
+        agua <= '0';
+ 
         M050 <= '1';
         WAIT FOR Clk_period;
         M050 <= '0';
+ 
         M100 <= '1';
         WAIT FOR Clk_period;
         M100 <= '0';
 
-        WAIT;
-
+        wait;
+		  
     END PROCESS;
+	 
 
 END TbMaq;

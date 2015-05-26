@@ -52,7 +52,7 @@ ENTITY Maquina IS
                 vmr025 := (OTHERS => '0'); -- guarda as quantidades de moeda nessa "seção"
                 vmr050 := (OTHERS => '0');
                 vmr100 := (OTHERS => '0');
-                t025 := (OTHERS => '0'); -- guarda as quantidades de moeda nessa "seção"
+                t025 := (OTHERS => '0'); -- guarda o total de moedas desde o reset
                 t050 := (OTHERS => '0');
                 t100 := (OTHERS => '0');
 
