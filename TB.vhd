@@ -23,7 +23,7 @@ ARCHITECTURE TbMaq OF TbMaq IS
     SIGNAL ir025 : unsigned(7 DOWNTO 0) := "00000101";
     SIGNAL ir050 : unsigned(7 DOWNTO 0) := "00000101";
     SIGNAL ir100 : unsigned(7 DOWNTO 0) := "00000101";
-	 SIGNAL iAgua : unsigned(7 DOWNTO 0) := "00000101";
+    SIGNAL iAgua : unsigned(7 DOWNTO 0) := "00000101";
     SIGNAL iSuco : unsigned(7 DOWNTO 0) := "00000101";
     SIGNAL mAgua : unsigned(7 DOWNTO 0);
     SIGNAL mSuco : unsigned(7 DOWNTO 0);
@@ -31,10 +31,10 @@ ARCHITECTURE TbMaq OF TbMaq IS
     --SIGNAL st025 : unsigned(7 DOWNTO 0);
     --SIGNAL st050 : unsigned(7 DOWNTO 0);
     --SIGNAL st100 : unsigned(7 DOWNTO 0);
-	 SIGNAL u025 : std_logic;
-	 SIGNAL u050 : std_logic;
-	 SIGNAL u100 : std_logic;
-	 
+    SIGNAL u025 : std_logic;
+    SIGNAL u050 : std_logic;
+    SIGNAL u100 : std_logic;
+ 
 
     CONSTANT Clk_period : TIME := 10 ns;
 BEGIN
@@ -59,16 +59,16 @@ BEGIN
             ir050   => ir050, 
             ir100   => ir100, 
             stts    => stts, 
-            --st025   => st025, 
-            --st050   => st050, 
-            --st100   => st100,
-				iAgua => iAgua,
-				mAgua => mAgua,
-				iSuco => iSuco,
-				mSuco => mSuco,
-				u025 => u025,
-				u050 => u050,
-				u100 => u100
+            --st025 => st025,
+            --st050 => st050,
+            --st100 => st100,
+            iAgua   => iAgua, 
+            mAgua   => mAgua, 
+            iSuco   => iSuco, 
+            mSuco   => mSuco, 
+            u025    => u025, 
+            u050    => u050, 
+            u100    => u100
         );
 
     Clk_process : PROCESS
@@ -85,17 +85,15 @@ BEGIN
         WAIT;
 
     END PROCESS;
- 
 
- 
     tests : PROCESS
     BEGIN
-	     reset <= '1';
+        reset <= '1';
         WAIT FOR clk_period/2;
         reset <= '0';
-		  -- insere moedas ate 1,75
-		  -- pede uma agua com 25 cents
-		  WAIT FOR Clk_period;
+        -- insere moedas ate 1,75
+        -- pede uma agua com 25 cents
+        WAIT FOR Clk_period;
         agua <= '1';
         M025 <= '1';
         WAIT FOR Clk_period;
@@ -111,7 +109,7 @@ BEGIN
         M100 <= '0';
 
         -- insere uma moeda de 1 real e retira uma agua
-		  wait for 40 ns;
+        WAIT FOR 40 ns;
         reset <= '1';
         WAIT FOR clk_period/2;
         reset <= '0';
@@ -124,6 +122,4 @@ BEGIN
         agua <= '0';
         WAIT;
     END PROCESS;
- 
-
 END TbMaq;
