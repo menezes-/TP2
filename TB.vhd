@@ -1,85 +1,92 @@
-library IEEE;
-use IEEE.STD_LOGIC_1164.all;
-use  ieee.numeric_std.all;
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE ieee.numeric_std.ALL;
 
-entity TbMaq is
-end TbMaq;
-architecture TbMaq of TbMaq is
-signal agua: STD_LOGIC;
-signal suco: STD_LOGIC;
-signal M100: STD_LOGIC;
-signal M050: STD_LOGIC;
-signal M025: STD_LOGIC;
-signal clk: std_logic;
-signal reset: std_logic;
-signal D025: STD_LOGIC;
-signal D050: STD_LOGIC;
-signal D100: STD_LOGIC;
-signal L_AGUA: STD_LOGIC;
-signal L_SUCO: STD_LOGIC;
-signal mr025: unsigned(7 downto 0);
-signal mr050: unsigned(7 downto 0);
-signal mr100: unsigned(7 downto 0);
-signal ir025: unsigned(7 downto 0) := "00000101";
-signal ir050: unsigned(7 downto 0) := "00000101";
-signal ir100: unsigned(7 downto 0) := "00000101";
-signal stts: std_logic_vector(2 downto 0);
-signal st025: unsigned(7 downto 0);
-signal st050: unsigned(7 downto 0);
-signal st100: unsigned(7 downto 0);
+ENTITY TbMaq IS
+END TbMaq;
+ARCHITECTURE TbMaq OF TbMaq IS
+    SIGNAL agua : STD_LOGIC;
+    SIGNAL suco : STD_LOGIC;
+    SIGNAL M100 : STD_LOGIC;
+    SIGNAL M050 : STD_LOGIC;
+    SIGNAL M025 : STD_LOGIC;
+    SIGNAL clk : std_logic;
+    SIGNAL reset : std_logic;
+    SIGNAL D025 : STD_LOGIC;
+    SIGNAL D050 : STD_LOGIC;
+    SIGNAL D100 : STD_LOGIC;
+    SIGNAL L_AGUA : STD_LOGIC;
+    SIGNAL L_SUCO : STD_LOGIC;
+    SIGNAL mr025 : unsigned(7 DOWNTO 0);
+    SIGNAL mr050 : unsigned(7 DOWNTO 0);
+    SIGNAL mr100 : unsigned(7 DOWNTO 0);
+    SIGNAL ir025 : unsigned(7 DOWNTO 0) := "00000101";
+    SIGNAL ir050 : unsigned(7 DOWNTO 0) := "00000101";
+    SIGNAL ir100 : unsigned(7 DOWNTO 0) := "00000101";
+    SIGNAL stts : std_logic_vector(2 DOWNTO 0);
+    SIGNAL st025 : unsigned(7 DOWNTO 0);
+    SIGNAL st050 : unsigned(7 DOWNTO 0);
+    SIGNAL st100 : unsigned(7 DOWNTO 0);
 
-constant Clk_period : time := 10 ns;
+    CONSTANT Clk_period : TIME := 10 ns;
 
-signal run: std_logic := '1';
-begin
-	 Maq:entity work.Maquina port map(agua=>agua,
-										suco=>suco,
-										M100=>M100,
-										M050=>M050,
-										M025=>M025,
-										clk=>clk,
-										reset=>reset,
-										D025=>D025,
-										D050=>D050,
-										D100=>D100,
-										L_AGUA=>L_AGUA,
-										L_SUCO=>L_SUCO,
-										mr025=>mr025,
-										mr050=>mr050,
-										mr100=>mr100,
-										ir025=>ir025,
-										ir050=>ir050,
-										ir100=>ir100,
-										stts=>stts,
-										st025=>st025,
-										st050=>st050,
-										st100=>st100
-);
-	 
-	Clk_process :process
-   begin
-	   
-		-- roda somente 10 vezes
-		 for I in 0 to 9 loop
-          Clk <= '0';
-          wait for Clk_period/2;
-          Clk <= '1';
-          wait for Clk_period/2;
-		 end loop;
-		 Clk <= '0';
-		 wait; 
-		
-   end process;
-	
-	stim_proc: process
-   begin
-    wait for Clk_period;
-    M025 <= '1';  wait for Clk_period; M025 <= '0';
-	 M050 <= '1';  wait for Clk_period; M050 <= '0';
-	 M100 <= '1';  wait for Clk_period; M100 <= '0';
+    SIGNAL run : std_logic := '1';
+BEGIN
+    Maq : ENTITY work.Maquina
+        PORT MAP(
+            agua    => agua, 
+            suco    => suco, 
+            M100    => M100, 
+            M050    => M050, 
+            M025    => M025, 
+            clk     => clk, 
+            reset   => reset, 
+            D025    => D025, 
+            D050    => D050, 
+            D100    => D100, 
+            L_AGUA  => L_AGUA, 
+            L_SUCO  => L_SUCO, 
+            mr025   => mr025, 
+            mr050   => mr050, 
+            mr100   => mr100, 
+            ir025   => ir025, 
+            ir050   => ir050, 
+            ir100   => ir100, 
+            stts    => stts, 
+            st025   => st025, 
+            st050   => st050, 
+            st100   => st100
+        );
 
-    wait;
+    Clk_process : PROCESS
+    BEGIN
+        -- roda somente 10 vezes
+        FOR I IN 0 TO 9 LOOP
+            Clk <= '0';
+            WAIT FOR Clk_period/2;
+            Clk <= '1';
+            WAIT FOR Clk_period/2;
+        END LOOP;
+        Clk <= '0';
+        WAIT;
 
-   end process;
+    END PROCESS;
 
-end TbMaq;
+    stim_proc : PROCESS
+    BEGIN
+        WAIT FOR Clk_period;
+        M025 <= '1';
+        WAIT FOR Clk_period;
+        M025 <= '0';
+        M050 <= '1';
+        WAIT FOR Clk_period;
+        M050 <= '0';
+        M100 <= '1';
+        WAIT FOR Clk_period;
+        M100 <= '0';
+
+        WAIT;
+
+    END PROCESS;
+
+END TbMaq;
