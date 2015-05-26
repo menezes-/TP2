@@ -28,9 +28,9 @@ ARCHITECTURE TbMaq OF TbMaq IS
     SIGNAL mAgua : unsigned(7 DOWNTO 0);
     SIGNAL mSuco : unsigned(7 DOWNTO 0);
     SIGNAL stts : std_logic_vector(2 DOWNTO 0);
-    SIGNAL st025 : unsigned(7 DOWNTO 0);
-    SIGNAL st050 : unsigned(7 DOWNTO 0);
-    SIGNAL st100 : unsigned(7 DOWNTO 0);
+    --SIGNAL st025 : unsigned(7 DOWNTO 0);
+    --SIGNAL st050 : unsigned(7 DOWNTO 0);
+    --SIGNAL st100 : unsigned(7 DOWNTO 0);
 	 SIGNAL u025 : std_logic;
 	 SIGNAL u050 : std_logic;
 	 SIGNAL u100 : std_logic;
@@ -59,9 +59,9 @@ BEGIN
             ir050   => ir050, 
             ir100   => ir100, 
             stts    => stts, 
-            st025   => st025, 
-            st050   => st050, 
-            st100   => st100,
+            --st025   => st025, 
+            --st050   => st050, 
+            --st100   => st100,
 				iAgua => iAgua,
 				mAgua => mAgua,
 				iSuco => iSuco,

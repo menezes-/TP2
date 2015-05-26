@@ -29,9 +29,9 @@ ENTITY Maquina IS
         mSuco : OUT unsigned(7 DOWNTO 0);
         stts : OUT std_logic_vector(2 DOWNTO 0);
         --abaixo portas de teste remover
-        st025 : OUT unsigned(7 DOWNTO 0);
-        st050 : OUT unsigned(7 DOWNTO 0);
-        st100 : OUT unsigned(7 DOWNTO 0);
+        --st025 : OUT unsigned(7 DOWNTO 0);
+        --st050 : OUT unsigned(7 DOWNTO 0);
+        --st100 : OUT unsigned(7 DOWNTO 0);
 		  u025 : OUT std_logic := '0';
 		  u050 : OUT std_logic := '0';
 		  u100 : OUT std_logic := '0'
@@ -233,9 +233,9 @@ ENTITY Maquina IS
                         END IF;
                 END CASE;
                 -- escreve a quantidade de moedas nos sinais de saida
-                st025 <= vmr025;
-                st050 <= vmr050;
-                st100 <= vmr100;
+                --st025 <= vmr025;
+                --st050 <= vmr050;
+                --st100 <= vmr100;
 					 
                 -- atualiza total de variaveis
                 IF status = "001" THEN
