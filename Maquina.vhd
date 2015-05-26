@@ -164,7 +164,7 @@ ENTITY Maquina IS
                         -- caso eu tenha devolvido a moeda inserida
                         -- pois passou de 175 para de dar moeda de um real
                         D100 <= '0';
- 
+
                         u025 <= '0';
                         u050 <= '0';
                         u100 <= '1';
@@ -176,7 +176,7 @@ ENTITY Maquina IS
                                 status := "001";
                             ELSE
                                 status := "100";
-                            END IF; 
+                            END IF;
                         ELSE -- se nao continua processamento normal
                             IF suco = '1' THEN
                                 status := "011";
@@ -204,6 +204,8 @@ ENTITY Maquina IS
                         END IF;
                     WHEN R125 => 
                         REPORT "estado r125";
+                        D100 <= '0'; -- evita dar um monte de moeda
+
                         u025 <= '1';
                         u050 <= '0';
                         u100 <= '1';
@@ -214,14 +216,24 @@ ENTITY Maquina IS
                             estado <= R175;
                             vmr050 := vmr050 + 1;
                         ELSIF M100 = '1' THEN
-                            estado <= R125;
-                            -- devolve 50c de troco
+                            IF t050 > 0 THEN
+                                -- se eu tiver troco de 50 cents
+                                D050 <= '1';
+                                t050 := t050 - 1; -- diminuo uma moeda de 50
+                                vmr100 := vmr100 + 1;
+                                estado <= R175;
+                            ELSE
+                                D100 <= '1';
+                                status := "011";
+                                estado <= R125;
+                            END IF;
                         END IF;
- 
- 
 
                     WHEN R150 => 
                         REPORT "estado r150";
+                        D100 <= '0'; -- evita dar um monte de moeda
+                        D050 <= '0'; -- evita dar um monte de moeda
+ 
                         u025 <= '0';
                         u050 <= '1';
                         u100 <= '1';
@@ -229,11 +241,31 @@ ENTITY Maquina IS
                             estado <= R175;
                             vmr025 := vmr025 + 1;
                         ELSIF M050 = '1' THEN
-                            estado <= R150;
-                            -- devolve 50c de troco
+                            IF t025 > 0 THEN
+                                -- se eu tiver troco de 25 cents
+                                D025 <= '1';
+                                t025 := t025 - 1; -- diminuo uma moeda de 25
+                                vmr050 := vmr050 + 1;
+                                estado <= R175;
+                            ELSE
+                                D050 <= '1';
+                                status := "011";
+                                estado <= R150;
+                            END IF;
                         ELSIF M100 = '1' THEN
-                            -- devolve 75c de troco
-                            estado <= R150;
+                            IF t025 = 0 OR t050 = 0 THEN
+                                D100 <= '1';
+                                status := "011";
+                                estado <= R150;
+
+                            ELSE
+                                D050 <= '1';
+                                t050 := t050 - 1;
+                                D025 <= '1';
+                                t025 := t025 - 1;
+                                estado <= R175;
+                                vmr100 := vmr100 + 1;
+                            END IF;
                         END IF;
                     WHEN R175 => 
                         REPORT "estado r175";
@@ -243,18 +275,18 @@ ENTITY Maquina IS
                         D025 <= '0';
                         D050 <= '0';
                         D100 <= '0';
- 
+
                         u025 <= '1';
                         u050 <= '1';
                         u100 <= '1';
                         IF M025 = '1' THEN
+                            D025 <= '1';
                             estado <= R175;
-                            -- devolve 25 de troco
                         ELSIF M050 = '1' THEN
+                            D050 <= '1';
                             estado <= R175;
-                            -- devolve 50 de troco
                         ELSIF M100 = '1' THEN
-                            -- devolve 1 de troco
+                            D100 <= '1';
                             estado <= R175;
                         END IF;
                 END CASE;
