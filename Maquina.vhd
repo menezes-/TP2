@@ -28,6 +28,8 @@ ENTITY Maquina IS
         mAgua : OUT unsigned(7 DOWNTO 0);
         mSuco : OUT unsigned(7 DOWNTO 0);
         stts : OUT std_logic_vector(2 DOWNTO 0);
+        DEV : IN std_logic;
+        L_DISP : OUT std_logic;
         --abaixo portas de teste remover
         --st025 : OUT unsigned(7 DOWNTO 0);
         --st050 : OUT unsigned(7 DOWNTO 0);
@@ -77,219 +79,234 @@ ENTITY Maquina IS
                 mSuco <= count_suco;
 
             ELSIF clk'EVENT AND clk = '1' THEN
-                CASE estado IS
-                    WHEN R000 => 
-                        L_AGUA <= '0'; -- para de liberar agua
-                        L_SUCO <= '0'; -- para de liberar suco
-                        u025 <= '0';
-                        u050 <= '0';
-                        u100 <= '0';
-                        status := "000";
-                        REPORT "estado r000";
-                        IF agua = '1' OR suco = '1' THEN
-                            status := "011";
-                        END IF;
-                        IF M025 = '1' THEN
-                            estado <= R025;
-                            vmr025 := vmr025 + 1;
-                        ELSIF M050 = '1' THEN
-                            estado <= R050;
-                            vmr050 := vmr050 + 1;
-                        ELSIF M100 = '1' THEN
-                            estado <= R100;
-                            vmr100 := vmr100 + 1;
-
-                        END IF;
-                    WHEN R025 => 
-                        REPORT "estado r025";
-                        u050 <= '0';
-                        u100 <= '0';
-                        u025 <= '1'; --seta visor de 25
-                        IF agua = '1' OR suco = '1' THEN
-                            status := "011";
-                        END IF;
-                        IF M025 = '1' THEN
-                            estado <= R050;
-                            vmr025 := vmr025 + 1;
-                        ELSIF M050 = '1' THEN
-                            estado <= R075;
-                            vmr050 := vmr050 + 1;
-                        ELSIF M100 = '1' THEN
-                            estado <= R125;
-                            vmr100 := vmr100 + 1;
-
-                        END IF;
-
-                    WHEN R050 => 
-                        u025 <= '0';
-                        u050 <= '1'; --seta visor de 50
-                        u100 <= '0';
-                        REPORT "estado r050";
-                        IF agua = '1' OR suco = '1' THEN
-                            status := "011";
-                        END IF;
-                        IF M025 = '1' THEN
-                            estado <= R075;
-                            vmr025 := vmr025 + 1;
-                        ELSIF M050 = '1' THEN
-                            estado <= R100;
-                            vmr050 := vmr050 + 1;
-                        ELSIF M100 = '1' THEN
-                            estado <= R150;
-                            vmr100 := vmr100 + 1;
-
-                        END IF;
-
-                    WHEN R075 => 
-                        REPORT "estado r075";
-                        u025 <= '1';
-                        u050 <= '1';
-                        u100 <= '0';
-                        IF agua = '1' OR suco = '1' THEN
-                            status := "011";
-                        END IF;
-                        IF M025 = '1' THEN
-                            estado <= R100;
-                            vmr025 := vmr025 + 1;
-                        ELSIF M050 = '1' THEN
-                            estado <= R125;
-                            vmr050 := vmr050 + 1;
-                        ELSIF M100 = '1' THEN
-                            estado <= R175;
-                            vmr100 := vmr100 + 1;
-
-                        END IF;
-                    WHEN R100 => 
-                        REPORT "estado r100";
-                        -- caso eu tenha devolvido a moeda inserida
-                        -- pois passou de 175 para de dar moeda de um real
-                        D100 <= '0';
-
-                        u025 <= '0';
-                        u050 <= '0';
-                        u100 <= '1';
-                        IF agua = '1' THEN
-                            -- entrega agua e termina a operacao
-                            IF count_agua > 0 THEN
-                                L_AGUA <= '1';
-                                count_agua := count_agua - 1;
-                                status := "001";
-                            ELSE
-                                status := "100";
-                            END IF;
-                        ELSE -- se nao continua processamento normal
-                            IF suco = '1' THEN
+                L_DISP <= '0';
+                IF DEV = '1' THEN -- se foi pedido a devolucao
+                    u025 <= '0';
+                    u050 <= '0';
+                    u100 <= '0';
+						  if vmr025 > 0 or vmr050 >0 or vmr100 > 0 then
+							  vmr025 := (OTHERS => '0');
+							  vmr050 := (OTHERS => '0');
+							  vmr100 := (OTHERS => '0');
+							  L_DISP <= '1';
+							end if;
+                    estado <= R000;
+						  status := "010";
+                ELSE
+                    CASE estado IS
+                        WHEN R000 => 
+                            L_AGUA <= '0'; -- para de liberar agua
+                            L_SUCO <= '0'; -- para de liberar suco
+                            u025 <= '0';
+                            u050 <= '0';
+                            u100 <= '0';
+                            status := "000";
+                            REPORT "estado r000";
+                            IF agua = '1' OR suco = '1' THEN
                                 status := "011";
                             END IF;
                             IF M025 = '1' THEN
-                                estado <= R125;
+                                estado <= R025;
                                 vmr025 := vmr025 + 1;
                             ELSIF M050 = '1' THEN
-                                estado <= R150;
+                                estado <= R050;
                                 vmr050 := vmr050 + 1;
                             ELSIF M100 = '1' THEN
-                                IF t025 > 0 THEN
-                                    -- se eu tiver troco de 25 cents
-                                    D025 <= '1';
-                                    t025 := t025 - 1; -- diminuo uma moeda de 25
+                                estado <= R100;
+                                vmr100 := vmr100 + 1;
+
+                            END IF;
+                        WHEN R025 => 
+                            REPORT "estado r025";
+                            u050 <= '0';
+                            u100 <= '0';
+                            u025 <= '1'; --seta visor de 25
+                            IF agua = '1' OR suco = '1' THEN
+                                status := "011";
+                            END IF;
+                            IF M025 = '1' THEN
+                                estado <= R050;
+                                vmr025 := vmr025 + 1;
+                            ELSIF M050 = '1' THEN
+                                estado <= R075;
+                                vmr050 := vmr050 + 1;
+                            ELSIF M100 = '1' THEN
+                                estado <= R125;
+                                vmr100 := vmr100 + 1;
+
+                            END IF;
+
+                        WHEN R050 => 
+                            u025 <= '0';
+                            u050 <= '1'; --seta visor de 50
+                            u100 <= '0';
+                            REPORT "estado r050";
+                            IF agua = '1' OR suco = '1' THEN
+                                status := "011";
+                            END IF;
+                            IF M025 = '1' THEN
+                                estado <= R075;
+                                vmr025 := vmr025 + 1;
+                            ELSIF M050 = '1' THEN
+                                estado <= R100;
+                                vmr050 := vmr050 + 1;
+                            ELSIF M100 = '1' THEN
+                                estado <= R150;
+                                vmr100 := vmr100 + 1;
+
+                            END IF;
+
+                        WHEN R075 => 
+                            REPORT "estado r075";
+                            u025 <= '1';
+                            u050 <= '1';
+                            u100 <= '0';
+                            IF agua = '1' OR suco = '1' THEN
+                                status := "011";
+                            END IF;
+                            IF M025 = '1' THEN
+                                estado <= R100;
+                                vmr025 := vmr025 + 1;
+                            ELSIF M050 = '1' THEN
+                                estado <= R125;
+                                vmr050 := vmr050 + 1;
+                            ELSIF M100 = '1' THEN
+                                estado <= R175;
+                                vmr100 := vmr100 + 1;
+
+                            END IF;
+                        WHEN R100 => 
+                            REPORT "estado r100";
+                            -- caso eu tenha devolvido a moeda inserida
+                            -- pois passou de 175 para de dar moeda de um real
+                            D100 <= '0';
+
+                            u025 <= '0';
+                            u050 <= '0';
+                            u100 <= '1';
+                            IF agua = '1' THEN
+                                -- entrega agua e termina a operacao
+                                IF count_agua > 0 THEN
+                                    L_AGUA <= '1';
+                                    count_agua := count_agua - 1;
+                                    status := "001";
+                                ELSE
+                                    status := "100";
+                                END IF;
+                            ELSE -- se nao continua processamento normal
+                                IF suco = '1' THEN
+                                    status := "011";
+                                END IF;
+                                IF M025 = '1' THEN
+                                    estado <= R125;
+                                    vmr025 := vmr025 + 1;
+                                ELSIF M050 = '1' THEN
+                                    estado <= R150;
+                                    vmr050 := vmr050 + 1;
+                                ELSIF M100 = '1' THEN
+                                    IF t025 > 0 THEN
+                                        -- se eu tiver troco de 25 cents
+                                        D025 <= '1';
+                                        t025 := t025 - 1; -- diminuo uma moeda de 25
+                                        vmr100 := vmr100 + 1;
+                                        estado <= R175;
+                                    ELSE
+                                        D100 <= '1';
+                                        status := "011";
+                                        estado <= R100;
+                                    END IF;
+
+                                END IF;
+                            END IF;
+                        WHEN R125 => 
+                            REPORT "estado r125";
+                            D100 <= '0'; -- evita dar um monte de moeda
+
+                            u025 <= '1';
+                            u050 <= '0';
+                            u100 <= '1';
+                            IF M025 = '1' THEN
+                                estado <= R150;
+                                vmr025 := vmr025 + 1;
+                            ELSIF M050 = '1' THEN
+                                estado <= R175;
+                                vmr050 := vmr050 + 1;
+                            ELSIF M100 = '1' THEN
+                                IF t050 > 0 THEN
+                                    -- se eu tiver troco de 50 cents
+                                    D050 <= '1';
+                                    t050 := t050 - 1; -- diminuo uma moeda de 50
                                     vmr100 := vmr100 + 1;
                                     estado <= R175;
                                 ELSE
                                     D100 <= '1';
                                     status := "011";
-                                    estado <= R100;
+                                    estado <= R125;
                                 END IF;
-
                             END IF;
-                        END IF;
-                    WHEN R125 => 
-                        REPORT "estado r125";
-                        D100 <= '0'; -- evita dar um monte de moeda
 
-                        u025 <= '1';
-                        u050 <= '0';
-                        u100 <= '1';
-                        IF M025 = '1' THEN
-                            estado <= R150;
-                            vmr025 := vmr025 + 1;
-                        ELSIF M050 = '1' THEN
-                            estado <= R175;
-                            vmr050 := vmr050 + 1;
-                        ELSIF M100 = '1' THEN
-                            IF t050 > 0 THEN
-                                -- se eu tiver troco de 50 cents
-                                D050 <= '1';
-                                t050 := t050 - 1; -- diminuo uma moeda de 50
-                                vmr100 := vmr100 + 1;
+                        WHEN R150 => 
+                            REPORT "estado r150";
+                            D100 <= '0'; -- evita dar um monte de moeda
+                            D050 <= '0'; -- evita dar um monte de moeda
+
+                            u025 <= '0';
+                            u050 <= '1';
+                            u100 <= '1';
+                            IF M025 = '1' THEN
                                 estado <= R175;
-                            ELSE
-                                D100 <= '1';
-                                status := "011";
-                                estado <= R125;
-                            END IF;
-                        END IF;
+                                vmr025 := vmr025 + 1;
+                            ELSIF M050 = '1' THEN
+                                IF t025 > 0 THEN
+                                    -- se eu tiver troco de 25 cents
+                                    D025 <= '1';
+                                    t025 := t025 - 1; -- diminuo uma moeda de 25
+                                    vmr050 := vmr050 + 1;
+                                    estado <= R175;
+                                ELSE
+                                    D050 <= '1';
+                                    status := "011";
+                                    estado <= R150;
+                                END IF;
+                            ELSIF M100 = '1' THEN
+                                IF t025 = 0 OR t050 = 0 THEN
+                                    D100 <= '1';
+                                    status := "011";
+                                    estado <= R150;
 
-                    WHEN R150 => 
-                        REPORT "estado r150";
-                        D100 <= '0'; -- evita dar um monte de moeda
-                        D050 <= '0'; -- evita dar um monte de moeda
- 
-                        u025 <= '0';
-                        u050 <= '1';
-                        u100 <= '1';
-                        IF M025 = '1' THEN
-                            estado <= R175;
-                            vmr025 := vmr025 + 1;
-                        ELSIF M050 = '1' THEN
-                            IF t025 > 0 THEN
-                                -- se eu tiver troco de 25 cents
+                                ELSE
+                                    D050 <= '1';
+                                    t050 := t050 - 1;
+                                    D025 <= '1';
+                                    t025 := t025 - 1;
+                                    estado <= R175;
+                                    vmr100 := vmr100 + 1;
+                                END IF;
+                            END IF;
+                        WHEN R175 => 
+                            REPORT "estado r175";
+                            -- se eu cheguei nesse estado por excesso de dinheiro
+                            -- (passou de 1,75) então reseta os sinais de moeda
+                            -- para não ficar dando dinheiro pra galere
+                            D025 <= '0';
+                            D050 <= '0';
+                            D100 <= '0';
+
+                            u025 <= '1';
+                            u050 <= '1';
+                            u100 <= '1';
+                            IF M025 = '1' THEN
                                 D025 <= '1';
-                                t025 := t025 - 1; -- diminuo uma moeda de 25
-                                vmr050 := vmr050 + 1;
                                 estado <= R175;
-                            ELSE
+                            ELSIF M050 = '1' THEN
                                 D050 <= '1';
-                                status := "011";
-                                estado <= R150;
-                            END IF;
-                        ELSIF M100 = '1' THEN
-                            IF t025 = 0 OR t050 = 0 THEN
+                                estado <= R175;
+                            ELSIF M100 = '1' THEN
                                 D100 <= '1';
-                                status := "011";
-                                estado <= R150;
-
-                            ELSE
-                                D050 <= '1';
-                                t050 := t050 - 1;
-                                D025 <= '1';
-                                t025 := t025 - 1;
                                 estado <= R175;
-                                vmr100 := vmr100 + 1;
                             END IF;
-                        END IF;
-                    WHEN R175 => 
-                        REPORT "estado r175";
-                        -- se eu cheguei nesse estado por excesso de dinheiro
-                        -- (passou de 1,75) então reseta os sinais de moeda
-                        -- para não ficar dando dinheiro pra galere
-                        D025 <= '0';
-                        D050 <= '0';
-                        D100 <= '0';
-
-                        u025 <= '1';
-                        u050 <= '1';
-                        u100 <= '1';
-                        IF M025 = '1' THEN
-                            D025 <= '1';
-                            estado <= R175;
-                        ELSIF M050 = '1' THEN
-                            D050 <= '1';
-                            estado <= R175;
-                        ELSIF M100 = '1' THEN
-                            D100 <= '1';
-                            estado <= R175;
-                        END IF;
-                END CASE;
+                    END CASE;
+                END IF;
                 -- escreve a quantidade de moedas nos sinais de saida
                 --st025 <= vmr025;
                 --st050 <= vmr050;

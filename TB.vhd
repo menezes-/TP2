@@ -34,6 +34,9 @@ ARCHITECTURE TbMaq OF TbMaq IS
     SIGNAL u025 : std_logic;
     SIGNAL u050 : std_logic;
     SIGNAL u100 : std_logic;
+	 SIGNAL DEV :  std_logic;
+	 SIGNAL L_DISP : std_logic;
+	 
     CONSTANT Clk_period : TIME := 10 ns;
     SIGNAL run : std_logic := '1';
 BEGIN
@@ -67,7 +70,9 @@ BEGIN
             mSuco   => mSuco, 
             u025    => u025, 
             u050    => u050, 
-            u100    => u100
+            u100    => u100,
+				DEV => DEV,
+				L_DISP => L_DISP
         );
 
     Clk_process : PROCESS
@@ -141,9 +146,16 @@ BEGIN
         reset <= '0';
 		  
 		  -- insere 1 moeda de um real e insere mais uma moeda de um real
+		  -- pede devolucao
 		  M100 <= '1';
-		  WAIT FOR clk_period*2; -- espera dois periodos de clock 
+		  WAIT FOR clk_period*2; -- espera dois periodos de clock (inserir 2 moedas)
 		  M100 <= '0';
+		  WAIT FOR clk_period;
+		  DEV <= '1'; -- pede devolucao
+		  WAIT FOR clk_period;
+		  DEV <= '0';
+		  WAIT FOR clk_period;
+		  
 		  
         run <= '0'; -- termina a simulacao
         WAIT;
