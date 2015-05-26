@@ -23,6 +23,10 @@ ENTITY Maquina IS
         ir025 : IN unsigned(7 DOWNTO 0);
         ir050 : IN unsigned(7 DOWNTO 0);
         ir100 : IN unsigned(7 DOWNTO 0);
+        iAgua : IN unsigned(7 DOWNTO 0);
+        iSuco : IN unsigned(7 DOWNTO 0);
+        mAgua : OUT unsigned(7 DOWNTO 0);
+        mSuco : OUT unsigned(7 DOWNTO 0);
         stts : OUT std_logic_vector(2 DOWNTO 0);
         --abaixo portas de teste remover
         st025 : OUT unsigned(7 DOWNTO 0);
@@ -43,6 +47,8 @@ ENTITY Maquina IS
         VARIABLE t025 : unsigned(7 DOWNTO 0) := (OTHERS => '0');
         VARIABLE t050 : unsigned(7 DOWNTO 0) := (OTHERS => '0');
         VARIABLE t100 : unsigned(7 DOWNTO 0) := (OTHERS => '0');
+        VARIABLE count_agua : unsigned(7 DOWNTO 0) := (OTHERS => '0');
+        VARIABLE count_suco : unsigned(7 DOWNTO 0) := (OTHERS => '0');
         VARIABLE status : std_logic_vector(2 DOWNTO 0);
         BEGIN
             IF reset = '1' THEN
@@ -52,18 +58,26 @@ ENTITY Maquina IS
                 vmr025 := (OTHERS => '0'); -- guarda as quantidades de moeda nessa "seção"
                 vmr050 := (OTHERS => '0');
                 vmr100 := (OTHERS => '0');
-                t025 := ir025; -- guarda o total de moedas desde o reset
+ 
+                --inicializa as moedas
+                t025 := ir025;
                 t050 := ir050;
                 t100 := ir100;
                 mr025 <= t025;
                 mr050 <= t050;
                 mr100 <= t100;
+ 
+                --inicializa agua e suco
+                count_agua := iAgua;
+                count_suco := iSuco;
+                mAgua <= count_agua;
+                mSuco <= count_suco;
 
             ELSIF clk'EVENT AND clk = '1' THEN
                 CASE estado IS
                     WHEN R000 => 
                         L_AGUA <= '0'; -- para de liberar agua
-                        L_SUCO <= '0'; -- para de liberar suco 
+                        L_SUCO <= '0'; -- para de liberar suco
                         status := "000";
                         REPORT "estado r000";
                         IF agua = '1' OR suco = '1' THEN
@@ -135,6 +149,7 @@ ENTITY Maquina IS
                         IF agua = '1' THEN
                             -- entrega agua e termina a operacao
                             L_AGUA <= '1';
+									 count_agua := count_agua - 1;
                             status := "001";
                         ELSE -- se nao continua processamento normal
                             IF suco = '1' THEN
@@ -196,17 +211,22 @@ ENTITY Maquina IS
                 st100 <= vmr100;
                 -- atualiza total de variaveis
                 IF status = "001" THEN
-
+                    -- atualiza moedas
                     t025 := t025 + vmr025;
                     t050 := t050 + vmr050;
                     t100 := t100 + vmr100;
                     mr025 <= t025;
                     mr050 <= t050;
                     mr100 <= t100;
+ 
+                    --atualiza os produtos
+                    mAgua <= count_agua;
+                    mSuco <= count_suco;
+ 
                     vmr025 := (OTHERS => '0'); -- guarda as quantidades de moeda nessa "seção"
                     vmr050 := (OTHERS => '0');
                     vmr100 := (OTHERS => '0');
- 
+
                     estado <= R000;
                 END IF;
                 stts <= status;
