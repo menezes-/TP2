@@ -20,9 +20,9 @@ ARCHITECTURE TbMaq OF TbMaq IS
     SIGNAL mr025 : unsigned(7 DOWNTO 0);
     SIGNAL mr050 : unsigned(7 DOWNTO 0);
     SIGNAL mr100 : unsigned(7 DOWNTO 0);
-    SIGNAL ir025 : unsigned(7 DOWNTO 0) := "00000101";
-    SIGNAL ir050 : unsigned(7 DOWNTO 0) := "00000101";
-    SIGNAL ir100 : unsigned(7 DOWNTO 0) := "00000101";
+    SIGNAL ir025 : unsigned(7 DOWNTO 0) := "00000001";
+    SIGNAL ir050 : unsigned(7 DOWNTO 0) := "00000001";
+    SIGNAL ir100 : unsigned(7 DOWNTO 0) := "00000001";
     SIGNAL iAgua : unsigned(7 DOWNTO 0) := "00000101";
     SIGNAL iSuco : unsigned(7 DOWNTO 0) := "00000101";
     SIGNAL mAgua : unsigned(7 DOWNTO 0);
@@ -126,7 +126,7 @@ BEGIN
         WAIT FOR clk_period/2;
         reset <= '0';
         FOR i IN 0 TO 5 LOOP
-
+            report integer'image(i);
             WAIT FOR clk_period;
             M100 <= '1'; -- insere moeda de um real
             WAIT FOR clk_period;
@@ -155,6 +155,74 @@ BEGIN
 		  WAIT FOR clk_period;
 		  DEV <= '0';
 		  WAIT FOR clk_period;
+		  
+		  WAIT FOR 40 ns;
+		  
+		   reset <= '1';
+        WAIT FOR clk_period/2;
+        reset <= '0';
+		  
+		  -- insere 3 de 25 e 1 de 50 e pede uma agua.
+		  M050 <= '1';
+		  WAIT FOR clk_period;
+		  M050 <= '0';
+		  FOR i IN 0 TO 2 LOOP
+				M025 <= '1';
+				WAIT FOR clk_period;
+				M025 <= '0';
+		  END LOOP;
+		  agua <= '1';
+		  WAIT FOR clk_period;
+		  agua <= '0';
+		  
+		  -- insere 1 de 50 e 1 de 1 e pede uma agua.
+		  M050 <= '1';
+		  WAIT FOR clk_period;
+		  M050 <= '0';
+		  M100 <= '1';
+		  WAIT FOR clk_period;
+		  M100 <= '0';
+		  agua <= '1';
+		  WAIT FOR clk_period;
+		  agua <= '0';
+		  
+		  -- insere uma de 1, uma de 50 e uma de 25 e pede uma agua
+		  wait for clk_period*5;
+		  
+		  M100 <= '1';
+		  WAIT FOR clk_period;
+		  M100 <= '0';
+		  M050 <= '1';
+		  WAIT FOR clk_period;
+		  M050 <= '0';
+		  M025 <= '1';
+		  WAIT FOR clk_period;
+		  M025 <= '0';
+		  WAIT FOR clk_period;
+		  
+		  agua <= '1';
+		  WAIT FOR clk_period;
+		  agua <= '0';
+		  
+		  -- insere uma de 1, uma de 50 e uma de 25 e pede um suco
+		  wait for clk_period*5;
+		  
+		  M100 <= '1';
+		  WAIT FOR clk_period;
+		  M100 <= '0';
+		  M050 <= '1';
+		  WAIT FOR clk_period;
+		  M050 <= '0';
+		  M025 <= '1';
+		  WAIT FOR clk_period;
+		  M025 <= '0';
+		  WAIT FOR clk_period;
+		  
+		  suco <= '1';
+		  WAIT FOR clk_period;
+		  suco <= '0';
+		  
+		  
 		  
 		  
         run <= '0'; -- termina a simulacao

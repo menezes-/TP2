@@ -84,19 +84,23 @@ ENTITY Maquina IS
                     u025 <= '0';
                     u050 <= '0';
                     u100 <= '0';
-						  if vmr025 > 0 or vmr050 >0 or vmr100 > 0 then
-							  vmr025 := (OTHERS => '0');
-							  vmr050 := (OTHERS => '0');
-							  vmr100 := (OTHERS => '0');
-							  L_DISP <= '1';
-							end if;
+                    IF vmr025 > 0 OR vmr050 > 0 OR vmr100 > 0 THEN
+                        vmr025 := (OTHERS => '0');
+                        vmr050 := (OTHERS => '0');
+                        vmr100 := (OTHERS => '0');
+                        L_DISP <= '1';
+                    END IF;
                     estado <= R000;
-						  status := "010";
+                    status := "010";
                 ELSE
                     CASE estado IS
                         WHEN R000 => 
                             L_AGUA <= '0'; -- para de liberar agua
                             L_SUCO <= '0'; -- para de liberar suco
+                            -- para de liberar moedas caso eu tenha dado troco
+                            D025 <= '0';
+                            D050 <= '0';
+                            D100 <= '0';
                             u025 <= '0';
                             u050 <= '0';
                             u100 <= '0';
@@ -104,6 +108,7 @@ ENTITY Maquina IS
                             REPORT "estado r000";
                             IF agua = '1' OR suco = '1' THEN
                                 status := "011";
+                                estado <= R000;
                             END IF;
                             IF M025 = '1' THEN
                                 estado <= R025;
@@ -123,6 +128,7 @@ ENTITY Maquina IS
                             u025 <= '1'; --seta visor de 25
                             IF agua = '1' OR suco = '1' THEN
                                 status := "011";
+                                estado <= R025;
                             END IF;
                             IF M025 = '1' THEN
                                 estado <= R050;
@@ -143,6 +149,7 @@ ENTITY Maquina IS
                             REPORT "estado r050";
                             IF agua = '1' OR suco = '1' THEN
                                 status := "011";
+                                estado <= R050;
                             END IF;
                             IF M025 = '1' THEN
                                 estado <= R075;
@@ -163,6 +170,7 @@ ENTITY Maquina IS
                             u100 <= '0';
                             IF agua = '1' OR suco = '1' THEN
                                 status := "011";
+                                estado <= R075;
                             END IF;
                             IF M025 = '1' THEN
                                 estado <= R100;
@@ -192,10 +200,12 @@ ENTITY Maquina IS
                                     status := "001";
                                 ELSE
                                     status := "100";
+                                    estado <= R100;
                                 END IF;
                             ELSE -- se nao continua processamento normal
                                 IF suco = '1' THEN
                                     status := "011";
+                                    estado <= R100;
                                 END IF;
                                 IF M025 = '1' THEN
                                     estado <= R125;
@@ -225,23 +235,47 @@ ENTITY Maquina IS
                             u025 <= '1';
                             u050 <= '0';
                             u100 <= '1';
-                            IF M025 = '1' THEN
-                                estado <= R150;
-                                vmr025 := vmr025 + 1;
-                            ELSIF M050 = '1' THEN
-                                estado <= R175;
-                                vmr050 := vmr050 + 1;
-                            ELSIF M100 = '1' THEN
-                                IF t050 > 0 THEN
-                                    -- se eu tiver troco de 50 cents
-                                    D050 <= '1';
-                                    t050 := t050 - 1; -- diminuo uma moeda de 50
-                                    vmr100 := vmr100 + 1;
-                                    estado <= R175;
+                            IF agua = '1' THEN
+                                IF count_agua > 0 THEN
+                                    IF t025 > 0 THEN
+                                        L_AGUA <= '1';
+                                        D025 <= '1';
+                                        t025 := t025 - 1;
+                                        count_agua := count_agua - 1;
+                                        status := "001";
+                                    ELSE
+                                        status := "101";
+                                        estado <= R125;
+                                    END IF;
                                 ELSE
-                                    D100 <= '1';
+                                    status := "100";
+                                    estado <= R125;
+                                END IF;
+
+                            ELSE
+                                IF suco = '1' THEN
                                     status := "011";
                                     estado <= R125;
+                                END IF;
+
+                                IF M025 = '1' THEN
+                                    estado <= R150;
+                                    vmr025 := vmr025 + 1;
+                                ELSIF M050 = '1' THEN
+                                    estado <= R175;
+                                    vmr050 := vmr050 + 1;
+                                ELSIF M100 = '1' THEN
+                                    IF t050 > 0 THEN
+                                        -- se eu tiver troco de 50 cents
+                                        D050 <= '1';
+                                        t050 := t050 - 1; -- diminuo uma moeda de 50
+                                        vmr100 := vmr100 + 1;
+                                        estado <= R175;
+                                    ELSE
+                                        D100 <= '1';
+                                        status := "011";
+                                        estado <= R125;
+                                    END IF;
                                 END IF;
                             END IF;
 
@@ -253,34 +287,56 @@ ENTITY Maquina IS
                             u025 <= '0';
                             u050 <= '1';
                             u100 <= '1';
-                            IF M025 = '1' THEN
-                                estado <= R175;
-                                vmr025 := vmr025 + 1;
-                            ELSIF M050 = '1' THEN
-                                IF t025 > 0 THEN
-                                    -- se eu tiver troco de 25 cents
-                                    D025 <= '1';
-                                    t025 := t025 - 1; -- diminuo uma moeda de 25
-                                    vmr050 := vmr050 + 1;
-                                    estado <= R175;
+                            IF agua = '1' THEN
+                                IF count_agua > 0 THEN
+                                    IF t050 > 0 THEN
+                                        L_AGUA <= '1';
+                                        D050 <= '1';
+                                        t050 := t050 - 1;
+                                        count_agua := count_agua - 1;
+                                        status := "001";
+                                    ELSE
+                                        status := "101";
+                                        estado <= R150;
+                                    END IF;
                                 ELSE
-                                    D050 <= '1';
+                                    status := "100";
+                                    estado <= R150;
+                                END IF;
+                            ELSE
+                                IF suco = '1' THEN
                                     status := "011";
                                     estado <= R150;
                                 END IF;
-                            ELSIF M100 = '1' THEN
-                                IF t025 = 0 OR t050 = 0 THEN
-                                    D100 <= '1';
-                                    status := "011";
-                                    estado <= R150;
-
-                                ELSE
-                                    D050 <= '1';
-                                    t050 := t050 - 1;
-                                    D025 <= '1';
-                                    t025 := t025 - 1;
+                                IF M025 = '1' THEN
                                     estado <= R175;
-                                    vmr100 := vmr100 + 1;
+                                    vmr025 := vmr025 + 1;
+                                ELSIF M050 = '1' THEN
+                                    IF t025 > 0 THEN
+                                        -- se eu tiver troco de 25 cents
+                                        D025 <= '1';
+                                        t025 := t025 - 1; -- diminuo uma moeda de 25
+                                        vmr050 := vmr050 + 1;
+                                        estado <= R175;
+                                    ELSE
+                                        D050 <= '1';
+                                        status := "011";
+                                        estado <= R150;
+                                    END IF;
+                                ELSIF M100 = '1' THEN
+                                    IF t025 = 0 OR t050 = 0 THEN
+                                        D100 <= '1';
+                                        status := "011";
+                                        estado <= R150;
+
+                                    ELSE
+                                        D050 <= '1';
+                                        t050 := t050 - 1;
+                                        D025 <= '1';
+                                        t025 := t025 - 1;
+                                        estado <= R175;
+                                        vmr100 := vmr100 + 1;
+                                    END IF;
                                 END IF;
                             END IF;
                         WHEN R175 => 
@@ -295,15 +351,46 @@ ENTITY Maquina IS
                             u025 <= '1';
                             u050 <= '1';
                             u100 <= '1';
-                            IF M025 = '1' THEN
-                                D025 <= '1';
-                                estado <= R175;
-                            ELSIF M050 = '1' THEN
-                                D050 <= '1';
-                                estado <= R175;
-                            ELSIF M100 = '1' THEN
-                                D100 <= '1';
-                                estado <= R175;
+                            IF suco = '1' THEN
+                                -- entrega agua e termina a operacao
+                                IF count_suco > 0 THEN
+                                    L_SUCO <= '1';
+                                    count_suco := count_suco - 1;
+                                    status := "001";
+                                ELSE
+                                    status := "100";
+                                    estado <= R175;
+                                END IF;
+                            ELSIF agua = '1' THEN
+                                IF count_agua > 0 THEN
+                                    IF t025 = 0 OR t050 = 0 THEN
+                                        status := "101";
+                                        estado <= R175;
+                                    ELSE
+                                        L_AGUA <= '1';
+                                        D050 <= '1';
+                                        D025 <= '1';
+                                        t050 := t050 - 1;
+                                        t025 := t025 - 1;
+                                        count_agua := count_agua - 1;
+                                        status := "001";
+                                    END IF;
+                                ELSE
+                                    status := "100";
+                                    estado <= R150;
+                                END IF;
+                            ELSE
+ 
+                                IF M025 = '1' THEN
+                                    D025 <= '1';
+                                    estado <= R175;
+                                ELSIF M050 = '1' THEN
+                                    D050 <= '1';
+                                    estado <= R175;
+                                ELSIF M100 = '1' THEN
+                                    D100 <= '1';
+                                    estado <= R175;
+                                END IF;
                             END IF;
                     END CASE;
                 END IF;
