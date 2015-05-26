@@ -34,9 +34,8 @@ ARCHITECTURE TbMaq OF TbMaq IS
     SIGNAL u025 : std_logic;
     SIGNAL u050 : std_logic;
     SIGNAL u100 : std_logic;
- 
-
     CONSTANT Clk_period : TIME := 10 ns;
+    SIGNAL run : std_logic := '1';
 BEGIN
     Maq : ENTITY work.Maquina
         PORT MAP(
@@ -75,12 +74,20 @@ BEGIN
 
     BEGIN
         -- roda somente 100 vezes
+ 
         FOR I IN 0 TO 100 LOOP
-            Clk <= '0';
-            WAIT FOR Clk_period/2;
-            Clk <= '1';
-            WAIT FOR Clk_period/2;
+            IF run = '1' THEN
+                Clk <= '0';
+                WAIT FOR Clk_period/2;
+                Clk <= '1';
+                WAIT FOR Clk_period/2;
+ 
+            ELSE
+                REPORT "Simulacao Completa" SEVERITY failure; -- para a simulacao
+ 
+            END IF; 
         END LOOP;
+ 
         Clk <= '0';
         WAIT;
 
@@ -108,18 +115,31 @@ BEGIN
         WAIT FOR Clk_period;
         M100 <= '0';
 
-        -- insere uma moeda de 1 real e retira uma agua
+        -- acaba com as aguas inserindo moedas de 1 real
         WAIT FOR 40 ns;
         reset <= '1';
         WAIT FOR clk_period/2;
         reset <= '0';
-        WAIT FOR clk_period;
-        M100 <= '1'; -- insere moeda de um real
-        WAIT FOR clk_period;
-        M100 <= '0';
-        agua <= '1'; -- pede uma agua
-        WAIT FOR clk_period;
-        agua <= '0';
+        FOR i IN 0 TO 5 LOOP
+
+            WAIT FOR clk_period;
+            M100 <= '1'; -- insere moeda de um real
+            WAIT FOR clk_period;
+            M100 <= '0';
+            agua <= '1'; -- pede uma agua
+            WAIT FOR clk_period;
+            agua <= '0';
+        END LOOP;
+		  
+		  WAIT FOR 40 ns;
+		  
+		  -- reseta
+		  reset <= '1';
+        WAIT FOR clk_period/2;
+        reset <= '0';
+		  
+		  
+        run <= '0'; -- termina a simulacao
         WAIT;
     END PROCESS;
 END TbMaq;
