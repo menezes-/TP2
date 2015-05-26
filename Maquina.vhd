@@ -32,6 +32,7 @@ end Maquina;
 
 architecture Behavioral of Maquina is
    type STATE_TYPE is (R000,R025,R050,R075,R100,R125,R150,R175);
+	signal  estado: STATE_TYPE := R000;
    
 
 begin
@@ -45,11 +46,11 @@ begin
 	variable t050: unsigned(7 downto 0) := ir050;
 	variable t100: unsigned(7 downto 0) := ir100;
 	variable status: std_logic_vector(2 downto 0);
-	variable  estado: STATE_TYPE := R000;
+	
 	
 	begin
 	 if reset = '1' then 
-	  estado :=R000;
+	  estado <=R000;
 		status := "000";
 		--reseta as moeda
 		 vmr025 := (others=>'0'); -- guarda as quantidades de moeda nessa "seção"
@@ -62,29 +63,88 @@ begin
 	elsif clk'event and clk = '1' then 
 	 case estado is
 	   when R000 =>
-		
+		   report "estado r025";
+		   if M025 = '1' then
+			   estado <= R025;
+		   elsif M050 = '1' then
+			   estado <= R050;
+			elsif M100 = '1' then 
+			   estado <= R100;
+			end if;
 		when R025 =>
-		report "estado r025";
+		   report "estado r025";
+		   if M025 = '1' then
+			   estado <= R050;
+		   elsif M050 = '1' then
+			   estado <= R075;
+			elsif M100 = '1' then 
+			   estado <= R125;
+			end if;
 
 		when R050 =>
-		report "estado r050";
+		   report "estado r050";
+		   if M025 = '1' then
+			   estado <= R075;
+		   elsif M050 = '1' then
+			   estado <= R100;
+			elsif M100 = '1' then 
+			   estado <= R150;
+			end if;
 
 		when R075 =>
-		report "estado r075";
-
-		   
+		   report "estado r075";
+		   if M025 = '1' then
+			   estado <= R100;
+		   elsif M050 = '1' then
+			   estado <= R125;
+			elsif M100 = '1' then 
+			   estado <= R175;
+			end if;
 		when R100 =>
-		report "estado r100";
-		  
+		   report "estado r100";
+		   if M025 = '1' then
+			   estado <= R125;
+		   elsif M050 = '1' then
+			   estado <= R150;
+			elsif M100 = '1' then 
+			   estado <= R100;
+				-- devolve 25c de troco 
+				
+			end if;		  
 		when R125 =>
-		report "estado r125";
-		       
+		   report "estado r125";
+		   if M025 = '1' then
+			   estado <= R150;
+		   elsif M050 = '1' then
+			   estado <= R175;
+			elsif M100 = '1' then 
+			   estado <= R125;
+				-- devolve 50c de troco 
+			end if;		       
 			
 		when R150 =>
-		report "estado r150";
-
+		   report "estado r150";
+		   if M025 = '1' then
+			   estado <= R175;
+		   elsif M050 = '1' then
+			   estado <= R150;
+				-- devolve 50c de troco 
+			elsif M100 = '1' then 
+			   -- devolve 75c de troco 
+			   estado <= R150;
+			end if;
 		when R175 =>
-		report "estado r175";
+		   report "estado r175";
+		   if M025 = '1' then
+			   estado <= R175;
+				-- devolve 25 de troco
+		   elsif M050 = '1' then
+			   estado <= R175;
+				-- devolve 50 de troco
+			elsif M100 = '1' then 
+			   -- devolve 1 de troco
+			   estado <= R175;
+			end if;
 	 end case;
 	 -- escreve a quantidade de moedas nos sinais de saida
     st025 <= vmr025;
@@ -108,7 +168,7 @@ begin
 	    vmr050 := (others=>'0');
 	    vmr100 := (others=>'0');
 		 status := "000";
-		estado :=R000;
+		 estado <=R000;
 		 
 	 end if;
 	 stts <= status;

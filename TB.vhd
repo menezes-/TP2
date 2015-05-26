@@ -59,8 +59,8 @@ begin
 	Clk_process :process
    begin
 	   
-		-- roda somente 3 vezes
-		 for I in 0 to 3 loop
+		-- roda somente 10 vezes
+		 for I in 0 to 9 loop
           Clk <= '0';
           wait for Clk_period/2;
           Clk <= '1';
@@ -75,6 +75,8 @@ begin
    begin
     wait for Clk_period;
     M025 <= '1';  wait for Clk_period; M025 <= '0';
+	 M050 <= '1';  wait for Clk_period; M050 <= '0';
+	 M100 <= '1';  wait for Clk_period; M100 <= '0';
 
     wait;
 
