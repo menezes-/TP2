@@ -4,18 +4,19 @@ USE IEEE.STD_LOGIC_1164.ALL;
 USE ieee.numeric_std.ALL;
 ENTITY Maquina IS
     PORT (
-        agua    : IN STD_LOGIC;
-        suco    : IN STD_LOGIC; 
-        M100    : IN STD_LOGIC;
-        M050    : IN STD_LOGIC;
-        M025    : IN STD_LOGIC;
-        clk     : IN std_logic;
+
         reset   : IN std_logic;
         D025    : OUT STD_LOGIC;
         D050    : OUT STD_LOGIC;
         D100    : OUT STD_LOGIC;
         L_AGUA  : OUT STD_LOGIC;
         L_SUCO  : OUT STD_LOGIC;
+		  agua    : IN STD_LOGIC;
+        suco    : IN STD_LOGIC;
+        M100    : IN STD_LOGIC;
+        M050    : IN STD_LOGIC;
+        M025    : IN STD_LOGIC;
+        clk     : IN std_logic;
         mr025 : OUT unsigned(7 DOWNTO 0) := (OTHERS => '0');
         mr050 : OUT unsigned(7 DOWNTO 0) := (OTHERS => '0');
         mr100 : OUT unsigned(7 DOWNTO 0) := (OTHERS => '0');
@@ -28,14 +29,12 @@ ENTITY Maquina IS
         st050 : OUT unsigned(7 DOWNTO 0);
         st100 : OUT unsigned(7 DOWNTO 0)
         );
- 
+
     END Maquina;
 
     ARCHITECTURE Behavioral OF Maquina IS
         TYPE STATE_TYPE IS (R000, R025, R050, R075, R100, R125, R150, R175);
         SIGNAL estado : STATE_TYPE := R000;
- 
-
     BEGIN
         PROCESS (clk, reset)
         VARIABLE vmr025 : unsigned(7 DOWNTO 0) := (OTHERS => '0'); -- guarda as quantidades de moeda nessa "seção"
@@ -45,8 +44,6 @@ ENTITY Maquina IS
         VARIABLE t050 : unsigned(7 DOWNTO 0) := ir050;
         VARIABLE t100 : unsigned(7 DOWNTO 0) := ir100;
         VARIABLE status : std_logic_vector(2 DOWNTO 0);
- 
- 
         BEGIN
             IF reset = '1' THEN
                 estado <= R000;
@@ -58,73 +55,106 @@ ENTITY Maquina IS
                 t025 := (OTHERS => '0'); -- guarda as quantidades de moeda nessa "seção"
                 t050 := (OTHERS => '0');
                 t100 := (OTHERS => '0');
- 
+
             ELSIF clk'EVENT AND clk = '1' THEN
                 CASE estado IS
                     WHEN R000 => 
                         REPORT "estado r025";
+                        IF agua = '1' OR suco = '1' THEN
+                            status := "011";
+                        END IF;
                         IF M025 = '1' THEN
                             estado <= R025;
+									 vmr025 := vmr025 + 1;
                         ELSIF M050 = '1' THEN
                             estado <= R050;
+									 vmr050 := vmr050 + 1;
                         ELSIF M100 = '1' THEN
                             estado <= R100;
+									 vmr100 := vmr100 + 1;
+ 
                         END IF;
                     WHEN R025 => 
                         REPORT "estado r025";
+                        IF agua = '1' OR suco = '1' THEN
+                            status := "011";
+                        END IF;
                         IF M025 = '1' THEN
                             estado <= R050;
+									 vmr025 := vmr025 + 1;
                         ELSIF M050 = '1' THEN
                             estado <= R075;
+									 vmr050 := vmr050 + 1;
                         ELSIF M100 = '1' THEN
                             estado <= R125;
+									 vmr100 := vmr100 + 1;
+ 
                         END IF;
 
                     WHEN R050 => 
                         REPORT "estado r050";
+                        IF agua = '1' OR suco = '1' THEN
+                            status := "011";
+                        END IF;
                         IF M025 = '1' THEN
                             estado <= R075;
+									 vmr025 := vmr025 + 1;
                         ELSIF M050 = '1' THEN
                             estado <= R100;
+									 vmr050 := vmr050 + 1;
                         ELSIF M100 = '1' THEN
                             estado <= R150;
+									 vmr100 := vmr100 + 1;
+ 
                         END IF;
 
                     WHEN R075 => 
                         REPORT "estado r075";
+                        IF agua = '1' OR suco = '1' THEN
+                            status := "011";
+                        END IF;
                         IF M025 = '1' THEN
                             estado <= R100;
+									 vmr025 := vmr025 + 1;
                         ELSIF M050 = '1' THEN
                             estado <= R125;
+									 vmr050 := vmr050 + 1;
                         ELSIF M100 = '1' THEN
                             estado <= R175;
+									 vmr100 := vmr100 + 1;
+ 
                         END IF;
                     WHEN R100 => 
                         REPORT "estado r100";
                         IF M025 = '1' THEN
                             estado <= R125;
+									 vmr025 := vmr025 + 1;
                         ELSIF M050 = '1' THEN
                             estado <= R150;
+									 vmr050 := vmr050 + 1;
                         ELSIF M100 = '1' THEN
                             estado <= R100;
                             -- devolve 25c de troco
- 
-                        END IF; 
+
+                        END IF;
                     WHEN R125 => 
                         REPORT "estado r125";
                         IF M025 = '1' THEN
                             estado <= R150;
+									 vmr025 := vmr025 + 1;
                         ELSIF M050 = '1' THEN
                             estado <= R175;
+									 vmr050 := vmr050 + 1;
                         ELSIF M100 = '1' THEN
                             estado <= R125;
                             -- devolve 50c de troco
-                        END IF; 
- 
+                        END IF;
+
                     WHEN R150 => 
                         REPORT "estado r150";
                         IF M025 = '1' THEN
                             estado <= R175;
+									 vmr025 := vmr025 + 1;
                         ELSIF M050 = '1' THEN
                             estado <= R150;
                             -- devolve 50c de troco
@@ -162,14 +192,9 @@ ENTITY Maquina IS
                     vmr100 := (OTHERS => '0');
                     status := "000";
                     estado <= R000;
- 
+
                 END IF;
                 stts <= status;
- 
-
             END IF;
         END PROCESS;
- 
- 
     END Behavioral;
-
